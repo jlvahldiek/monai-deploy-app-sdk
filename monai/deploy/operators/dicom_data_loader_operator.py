@@ -253,6 +253,13 @@ class DICOMDataLoaderOperator(Operator):
             if pixel_spacing_de is not None:
                 series.row_pixel_spacing = pixel_spacing_de.value[0]
                 series.col_pixel_spacing = pixel_spacing_de.value[1]
+            else:
+                # fix for 2D DICOMs (i.e. xrays) that do not contain PixelSpacing
+                # (tag 0028,0030) but contain ImagerPixelSpacing (tag 0018, 1164)
+                imager_pixel_spacing_de = sop_instance[0x0018, 0x1164]
+                if imager_pixel_spacing_de is not None:
+                    series.row_pixel_spacing = imager_pixel_spacing_de.value[0]
+                    series.col_pixel_spacing = imager_pixel_spacing_de.value[1]
         except KeyError:
             pass
 
